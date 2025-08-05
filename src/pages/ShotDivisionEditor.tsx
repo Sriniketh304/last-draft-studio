@@ -92,99 +92,109 @@ export const ShotDivisionEditor = () => {
 
       {/* Shot Division Table */}
       <div className="p-6">
-        <div className="bg-card rounded-lg shadow-card overflow-hidden">
+        <div className="bg-white rounded-lg shadow-card overflow-hidden border border-gray-300">
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-muted">
-                <tr>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-foreground border-r border-border">Ref No.</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-foreground border-r border-border">Shot No.</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-foreground border-r border-border">INT/EXT</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-foreground border-r border-border">Shot</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-foreground border-r border-border">Camera Angle</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-foreground border-r border-border">Camera Move</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-foreground border-r border-border">Subject</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-foreground border-r border-border">Description</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-foreground">Actions</th>
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-800 border border-gray-300 min-w-[80px]">Script/SB Ref.</th>
+                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-800 border border-gray-300 min-w-[60px]">Shot #</th>
+                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-800 border border-gray-300 min-w-[80px]">Interior Exterior</th>
+                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-800 border border-gray-300 min-w-[60px]">Shot</th>
+                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-800 border border-gray-300 min-w-[90px]">Camera Angle</th>
+                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-800 border border-gray-300 min-w-[90px]">Camera Move</th>
+                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-800 border border-gray-300 min-w-[60px]">Audio</th>
+                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-800 border border-gray-300 min-w-[120px]">Subject</th>
+                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-800 border border-gray-300 min-w-[200px]">Description of Shot</th>
+                  <th className="px-3 py-2 text-left text-xs font-semibold text-gray-800 border border-gray-300 min-w-[80px]">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {rows.map((row, index) => (
-                  <tr key={row.id} className={index % 2 === 0 ? 'bg-background' : 'bg-card/50'}>
-                    <td className="px-4 py-2 border-r border-border">
+                  <tr key={row.id} className="hover:bg-gray-50">
+                    <td className="border border-gray-300 p-0">
                       <input
                         type="text"
                         value={row.refNo}
                         onChange={(e) => updateRow(row.id, 'refNo', e.target.value)}
-                        className="w-full bg-white border border-border outline-none text-sm text-black focus:bg-white rounded px-2 py-1"
+                        className="w-full h-full bg-white border-0 outline-none text-xs text-black px-2 py-2 min-h-[40px]"
                       />
                     </td>
-                    <td className="px-4 py-2 border-r border-border">
+                    <td className="border border-gray-300 p-0">
                       <input
                         type="text"
                         value={row.shotNo}
                         onChange={(e) => updateRow(row.id, 'shotNo', e.target.value)}
-                        className="w-full bg-white border border-border outline-none text-sm text-black focus:bg-white rounded px-2 py-1"
+                        className="w-full h-full bg-white border-0 outline-none text-xs text-black px-2 py-2 min-h-[40px]"
                       />
                     </td>
-                    <td className="px-4 py-2 border-r border-border">
+                    <td className="border border-gray-300 p-0">
                       <select
                         value={row.intExt}
                         onChange={(e) => updateRow(row.id, 'intExt', e.target.value)}
-                        className="w-full bg-white border border-border outline-none text-sm text-black focus:bg-white rounded px-2 py-1"
+                        className="w-full h-full bg-white border-0 outline-none text-xs text-black px-2 py-2 min-h-[40px]"
                       >
-                        <option value="INT">INT</option>
-                        <option value="EXT">EXT</option>
+                        <option value="INT">Interior</option>
+                        <option value="EXT">Exterior</option>
                       </select>
                     </td>
-                    <td className="px-4 py-2 border-r border-border">
+                    <td className="border border-gray-300 p-0">
                       <input
                         type="text"
                         value={row.shot}
                         onChange={(e) => updateRow(row.id, 'shot', e.target.value)}
-                        className="w-full bg-white border border-border outline-none text-sm text-black focus:bg-white rounded px-2 py-1"
+                        className="w-full h-full bg-white border-0 outline-none text-xs text-black px-2 py-2 min-h-[40px]"
                       />
                     </td>
-                    <td className="px-4 py-2 border-r border-border">
+                    <td className="border border-gray-300 p-0">
                       <input
                         type="text"
                         value={row.cameraAngle}
                         onChange={(e) => updateRow(row.id, 'cameraAngle', e.target.value)}
-                        className="w-full bg-white border border-border outline-none text-sm text-black focus:bg-white rounded px-2 py-1"
+                        className="w-full h-full bg-white border-0 outline-none text-xs text-black px-2 py-2 min-h-[40px]"
                       />
                     </td>
-                    <td className="px-4 py-2 border-r border-border">
+                    <td className="border border-gray-300 p-0">
                       <input
                         type="text"
                         value={row.cameraMove}
                         onChange={(e) => updateRow(row.id, 'cameraMove', e.target.value)}
-                        className="w-full bg-white border border-border outline-none text-sm text-black focus:bg-white rounded px-2 py-1"
+                        className="w-full h-full bg-white border-0 outline-none text-xs text-black px-2 py-2 min-h-[40px]"
                       />
                     </td>
-                    <td className="px-4 py-2 border-r border-border">
+                    <td className="border border-gray-300 p-0">
+                      <input
+                        type="text"
+                        value=""
+                        onChange={() => {}}
+                        className="w-full h-full bg-white border-0 outline-none text-xs text-black px-2 py-2 min-h-[40px]"
+                        placeholder="VO"
+                      />
+                    </td>
+                    <td className="border border-gray-300 p-0">
                       <textarea
                         value={row.subject}
                         onChange={(e) => updateRow(row.id, 'subject', e.target.value)}
-                        className="w-full bg-white border border-border outline-none text-sm text-black focus:bg-white rounded px-2 py-1 resize-none"
-                        rows={2}
+                        className="w-full h-full bg-white border-0 outline-none text-xs text-black px-2 py-2 resize-none min-h-[40px]"
+                        rows={3}
                       />
                     </td>
-                    <td className="px-4 py-2 border-r border-border">
+                    <td className="border border-gray-300 p-0">
                       <textarea
                         value={row.description}
                         onChange={(e) => updateRow(row.id, 'description', e.target.value)}
-                        className="w-full bg-white border border-border outline-none text-sm text-black focus:bg-white rounded px-2 py-1 resize-none"
-                        rows={2}
+                        className="w-full h-full bg-white border-0 outline-none text-xs text-black px-2 py-2 resize-none min-h-[40px]"
+                        rows={3}
                       />
                     </td>
-                    <td className="px-4 py-2">
+                    <td className="border border-gray-300 p-2">
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => deleteRow(row.id)}
-                        className="text-destructive hover:text-destructive"
+                        className="text-destructive hover:text-destructive h-8 w-8 p-0"
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-3 w-3" />
                       </Button>
                     </td>
                   </tr>

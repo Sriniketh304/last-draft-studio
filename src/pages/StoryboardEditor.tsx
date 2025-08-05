@@ -156,7 +156,7 @@ export const StoryboardEditor = () => {
     console.log("Saving storyboard");
   };
 
-  const colors = ['#000000', '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'];
+  const colors = ['#000000', '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#FFA500', '#800080', '#FFC0CB', '#A52A2A', '#808080'];
 
   return (
     <div className="min-h-screen bg-background">
@@ -215,16 +215,25 @@ export const StoryboardEditor = () => {
 
           {/* Colors */}
           <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-foreground mr-2">Colors:</span>
             {colors.map((color) => (
               <button
                 key={color}
-                className={`w-8 h-8 rounded-full border-2 ${
-                  currentColor === color ? 'border-primary' : 'border-border'
+                className={`w-8 h-8 rounded-full border-2 transition-all hover:scale-110 ${
+                  currentColor === color ? 'border-primary border-4' : 'border-gray-400'
                 }`}
                 style={{ backgroundColor: color }}
                 onClick={() => setCurrentColor(color)}
+                title={`Select ${color}`}
               />
             ))}
+            <input
+              type="color"
+              value={currentColor}
+              onChange={(e) => setCurrentColor(e.target.value)}
+              className="w-8 h-8 rounded-full border-2 border-gray-400 cursor-pointer"
+              title="Custom color picker"
+            />
           </div>
 
 
