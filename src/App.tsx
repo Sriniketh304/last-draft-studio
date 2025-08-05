@@ -5,6 +5,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import { ProjectSelection } from "./pages/ProjectSelection";
+import { ScreenplayEditor } from "./pages/ScreenplayEditor";
+import { StoryboardEditor } from "./pages/StoryboardEditor";
+import { ShotDivisionEditor } from "./pages/ShotDivisionEditor";
 
 const queryClient = new QueryClient();
 
@@ -16,6 +20,12 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/screenplay" element={<ProjectSelection />} />
+          <Route path="/screenplay/editor" element={<ScreenplayEditor />} />
+          <Route path="/storyboard" element={<ProjectSelection />} />
+          <Route path="/storyboard/editor" element={<StoryboardEditor />} />
+          <Route path="/shotdivision" element={<ProjectSelection />} />
+          <Route path="/shotdivision/editor" element={<ShotDivisionEditor />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
