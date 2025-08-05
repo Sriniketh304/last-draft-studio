@@ -130,23 +130,9 @@ export const ScreenplayEditor = () => {
 
       {/* Main Editor */}
       <div className="flex max-w-7xl mx-auto">
-        {/* Navigation Panel */}
-        <div className="w-64 border-r border-border bg-card/50 p-4">
-          <h3 className="font-semibold text-foreground mb-4">Navigation</h3>
-          <div className="space-y-2">
-            {formatOptions.map((format) => (
-              <div 
-                key={format.value}
-                className="p-2 rounded cursor-pointer hover:bg-muted text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {format.label}
-              </div>
-            ))}
-          </div>
-        </div>
 
         {/* Script Editor */}
-        <div className="flex-1 p-6">
+        <div className="flex-1 p-6 max-w-none">
           <div className="bg-white rounded-lg shadow-card min-h-[800px] p-8">
             <textarea
               value={scriptContent}

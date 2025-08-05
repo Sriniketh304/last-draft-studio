@@ -116,7 +116,7 @@ export const ShotDivisionEditor = () => {
                         type="text"
                         value={row.refNo}
                         onChange={(e) => updateRow(row.id, 'refNo', e.target.value)}
-                        className="w-full bg-transparent border-none outline-none text-sm text-foreground focus:bg-muted/50 rounded px-2 py-1"
+                        className="w-full bg-white border border-border outline-none text-sm text-black focus:bg-white rounded px-2 py-1"
                       />
                     </td>
                     <td className="px-4 py-2 border-r border-border">
@@ -124,14 +124,14 @@ export const ShotDivisionEditor = () => {
                         type="text"
                         value={row.shotNo}
                         onChange={(e) => updateRow(row.id, 'shotNo', e.target.value)}
-                        className="w-full bg-transparent border-none outline-none text-sm text-foreground focus:bg-muted/50 rounded px-2 py-1"
+                        className="w-full bg-white border border-border outline-none text-sm text-black focus:bg-white rounded px-2 py-1"
                       />
                     </td>
                     <td className="px-4 py-2 border-r border-border">
                       <select
                         value={row.intExt}
                         onChange={(e) => updateRow(row.id, 'intExt', e.target.value)}
-                        className="w-full bg-transparent border-none outline-none text-sm text-foreground focus:bg-muted/50 rounded px-2 py-1"
+                        className="w-full bg-white border border-border outline-none text-sm text-black focus:bg-white rounded px-2 py-1"
                       >
                         <option value="INT">INT</option>
                         <option value="EXT">EXT</option>
@@ -142,7 +142,7 @@ export const ShotDivisionEditor = () => {
                         type="text"
                         value={row.shot}
                         onChange={(e) => updateRow(row.id, 'shot', e.target.value)}
-                        className="w-full bg-transparent border-none outline-none text-sm text-foreground focus:bg-muted/50 rounded px-2 py-1"
+                        className="w-full bg-white border border-border outline-none text-sm text-black focus:bg-white rounded px-2 py-1"
                       />
                     </td>
                     <td className="px-4 py-2 border-r border-border">
@@ -150,7 +150,7 @@ export const ShotDivisionEditor = () => {
                         type="text"
                         value={row.cameraAngle}
                         onChange={(e) => updateRow(row.id, 'cameraAngle', e.target.value)}
-                        className="w-full bg-transparent border-none outline-none text-sm text-foreground focus:bg-muted/50 rounded px-2 py-1"
+                        className="w-full bg-white border border-border outline-none text-sm text-black focus:bg-white rounded px-2 py-1"
                       />
                     </td>
                     <td className="px-4 py-2 border-r border-border">
@@ -158,14 +158,14 @@ export const ShotDivisionEditor = () => {
                         type="text"
                         value={row.cameraMove}
                         onChange={(e) => updateRow(row.id, 'cameraMove', e.target.value)}
-                        className="w-full bg-transparent border-none outline-none text-sm text-foreground focus:bg-muted/50 rounded px-2 py-1"
+                        className="w-full bg-white border border-border outline-none text-sm text-black focus:bg-white rounded px-2 py-1"
                       />
                     </td>
                     <td className="px-4 py-2 border-r border-border">
                       <textarea
                         value={row.subject}
                         onChange={(e) => updateRow(row.id, 'subject', e.target.value)}
-                        className="w-full bg-transparent border-none outline-none text-sm text-foreground focus:bg-muted/50 rounded px-2 py-1 resize-none"
+                        className="w-full bg-white border border-border outline-none text-sm text-black focus:bg-white rounded px-2 py-1 resize-none"
                         rows={2}
                       />
                     </td>
@@ -173,7 +173,7 @@ export const ShotDivisionEditor = () => {
                       <textarea
                         value={row.description}
                         onChange={(e) => updateRow(row.id, 'description', e.target.value)}
-                        className="w-full bg-transparent border-none outline-none text-sm text-foreground focus:bg-muted/50 rounded px-2 py-1 resize-none"
+                        className="w-full bg-white border border-border outline-none text-sm text-black focus:bg-white rounded px-2 py-1 resize-none"
                         rows={2}
                       />
                     </td>

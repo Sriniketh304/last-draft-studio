@@ -227,30 +227,6 @@ export const StoryboardEditor = () => {
             ))}
           </div>
 
-          {/* Shapes */}
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => addShape('rectangle')}
-            >
-              <Square className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => addShape('circle')}
-            >
-              <Circle className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => addShape('triangle')}
-            >
-              <Triangle className="h-4 w-4" />
-            </Button>
-          </div>
 
           <Button variant="destructive" size="sm" onClick={clearCanvas}>
             Clear
