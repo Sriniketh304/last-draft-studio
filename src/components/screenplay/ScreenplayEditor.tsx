@@ -97,7 +97,16 @@ export const ScreenplayEditor = () => {
                 fontSize: "14px",
                 lineHeight: 1.6,
                 minHeight: "700px",
-                color: "black"
+                color: "black",
+                alignItems: "flex-start",
+                "& textarea": {
+                  textAlign: "left"
+                }
+              }
+            }}
+            sx={{
+              "& .MuiInputBase-root": {
+                alignItems: "flex-start"
               }
             }}
           />

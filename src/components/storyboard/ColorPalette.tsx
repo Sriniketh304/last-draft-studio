@@ -1,5 +1,6 @@
-import { Box, Typography, IconButton } from "@mui/material";
+import { Box, Typography, IconButton, Button, Popover } from "@mui/material";
 import { Palette } from "@mui/icons-material";
+import { useState } from "react";
 
 interface ColorPaletteProps {
   currentColor: string;
@@ -7,6 +8,8 @@ interface ColorPaletteProps {
 }
 
 export const ColorPalette = ({ currentColor, onColorChange }: ColorPaletteProps) => {
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+
   const colors = [
     '#000000', '#FF0000', '#00FF00', '#0000FF', 
     '#FFFF00', '#FF00FF', '#00FFFF', '#FFA500', 
@@ -15,47 +18,89 @@ export const ColorPalette = ({ currentColor, onColorChange }: ColorPaletteProps)
     '#FF69B4', '#32CD32', '#FF4500', '#9932CC'
   ];
 
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+
   return (
     <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-      <Typography variant="subtitle2" fontWeight="medium">
-        Colors:
-      </Typography>
-      <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-        {colors.map((color) => (
-          <IconButton
-            key={color}
-            onClick={() => onColorChange(color)}
-            sx={{
-              width: 32,
-              height: 32,
-              backgroundColor: color,
-              border: currentColor === color ? "3px solid #1976d2" : "2px solid #ccc",
-              borderRadius: "50%",
-              minWidth: "unset",
-              "&:hover": {
-                transform: "scale(1.1)",
-              },
-            }}
-          />
-        ))}
-        <Box sx={{ display: "flex", alignItems: "center", ml: 1 }}>
-          <Palette sx={{ mr: 1, color: "text.secondary" }} />
-          <input
-            type="color"
-            value={currentColor}
-            onChange={(e) => onColorChange(e.target.value)}
-            style={{
-              width: "32px",
-              height: "32px",
-              borderRadius: "50%",
-              border: "2px solid #ccc",
-              cursor: "pointer",
-              backgroundColor: "transparent"
-            }}
-            title="Custom color picker"
-          />
+      <Button
+        variant="outlined"
+        startIcon={<Palette />}
+        onClick={handleClick}
+        sx={{ 
+          textTransform: "none",
+          "& .MuiButton-startIcon": {
+            color: currentColor
+          }
+        }}
+      >
+        Color Selection
+      </Button>
+      
+      <Popover
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+      >
+        <Box sx={{ p: 2, maxWidth: 300 }}>
+          <Typography variant="subtitle2" fontWeight="medium" mb={2}>
+            Choose Color:
+          </Typography>
+          <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap", mb: 2 }}>
+            {colors.map((color) => (
+              <IconButton
+                key={color}
+                onClick={() => {
+                  onColorChange(color);
+                  handleClose();
+                }}
+                sx={{
+                  width: 32,
+                  height: 32,
+                  backgroundColor: color,
+                  border: currentColor === color ? "3px solid #1976d2" : "2px solid #ccc",
+                  borderRadius: "50%",
+                  minWidth: "unset",
+                  "&:hover": {
+                    transform: "scale(1.1)",
+                  },
+                }}
+              />
+            ))}
+          </Box>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Typography variant="body2">Custom:</Typography>
+            <input
+              type="color"
+              value={currentColor}
+              onChange={(e) => {
+                onColorChange(e.target.value);
+                handleClose();
+              }}
+              style={{
+                width: "40px",
+                height: "32px",
+                borderRadius: "4px",
+                border: "2px solid #ccc",
+                cursor: "pointer",
+                backgroundColor: "transparent"
+              }}
+              title="Custom color picker"
+            />
+          </Box>
         </Box>
-      </Box>
+      </Popover>
     </Box>
   );
 };
