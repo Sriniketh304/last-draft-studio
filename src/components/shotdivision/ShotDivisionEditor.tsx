@@ -1,15 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   AppBar, 
   Toolbar, 
   Typography, 
   Container, 
   Box,
-  Button
+  Button,
+  IconButton
 } from "@mui/material";
-import { ArrowBack, Add, Save, Download } from "@mui/icons-material";
+import { ArrowBack, Add, Save, Download, Edit } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { ShotTable } from "./ShotTable";
+import { RenameDialog } from "../common/RenameDialog";
 
 export interface Shot {
   id: string;
@@ -23,6 +25,8 @@ export interface Shot {
 
 export const ShotDivisionEditor = () => {
   const navigate = useNavigate();
+  const [projectName, setProjectName] = useState("Untitled Shot Division");
+  const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const [shots, setShots] = useState<Shot[]>([
     {
       id: "1",
@@ -34,6 +38,14 @@ export const ShotDivisionEditor = () => {
       notes: ""
     }
   ]);
+
+  useEffect(() => {
+    const savedProjectName = localStorage.getItem('shotdivision_project_name');
+    if (savedProjectName) {
+      setProjectName(savedProjectName);
+      localStorage.removeItem('shotdivision_project_name');
+    }
+  }, []);
 
   const addShot = () => {
     const newShot: Shot = {
@@ -61,11 +73,22 @@ export const ShotDivisionEditor = () => {
   };
 
   const handleSave = () => {
-    console.log("Saving shot division:", shots);
+    console.log("Saving shot division:", { projectName, shots });
   };
 
   const handleExport = () => {
-    console.log("Exporting shot division");
+    const dataStr = JSON.stringify({ projectName, shots, exportDate: new Date().toISOString() }, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    const exportFileDefaultName = `${projectName.replace(/\s+/g, '_')}_shot_division.json`;
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+  };
+
+  const handleRename = (newName: string) => {
+    setProjectName(newName);
   };
 
   return (
@@ -80,9 +103,16 @@ export const ShotDivisionEditor = () => {
             >
               <ArrowBack />
             </Box>
-            <Typography variant="h6">
-              Shot Division Editor
+            <Typography variant="h6" sx={{ mr: 1 }}>
+              {projectName}
             </Typography>
+            <IconButton 
+              size="small" 
+              onClick={() => setRenameDialogOpen(true)}
+              sx={{ ml: 1 }}
+            >
+              <Edit fontSize="small" />
+            </IconButton>
           </Box>
 
           <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -123,6 +153,14 @@ export const ShotDivisionEditor = () => {
           onDeleteShot={deleteShot}
         />
       </Container>
+
+      {/* Rename Dialog */}
+      <RenameDialog
+        open={renameDialogOpen}
+        onClose={() => setRenameDialogOpen(false)}
+        onRename={handleRename}
+        currentName={projectName}
+      />
     </Box>
   );
 };

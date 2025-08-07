@@ -6,10 +6,12 @@ import {
   Container, 
   Paper, 
   Box,
-  Button
+  Button,
+  IconButton
 } from "@mui/material";
-import { ArrowBack } from "@mui/icons-material";
+import { ArrowBack, Edit } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import { RenameDialog } from "../common/RenameDialog";
 import { StoryboardToolbar } from "./StoryboardToolbar";
 import { StoryboardCanvas } from "./StoryboardCanvas";
 import { DrawingTools } from "./DrawingTools";
@@ -17,6 +19,8 @@ import { ColorPalette } from "./ColorPalette";
 
 export const StoryboardEditor = () => {
   const navigate = useNavigate();
+  const [projectName, setProjectName] = useState("Untitled Storyboard");
+  const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentTool, setCurrentTool] = useState<'pen' | 'eraser'>('pen');
   const [currentColor, setCurrentColor] = useState('#000000');
@@ -26,6 +30,14 @@ export const StoryboardEditor = () => {
     { id: 3, canvasRef: useRef<HTMLCanvasElement>(null) },
     { id: 4, canvasRef: useRef<HTMLCanvasElement>(null) }
   ]);
+
+  useEffect(() => {
+    const savedProjectName = localStorage.getItem('storyboard_project_name');
+    if (savedProjectName) {
+      setProjectName(savedProjectName);
+      localStorage.removeItem('storyboard_project_name');
+    }
+  }, []);
 
   useEffect(() => {
     storyboardPanels.forEach(panel => {
@@ -110,6 +122,10 @@ export const StoryboardEditor = () => {
     setStoryboardPanels(prev => [...prev, { id: newId, canvasRef: useRef<HTMLCanvasElement>(null) }]);
   };
 
+  const handleRename = (newName: string) => {
+    setProjectName(newName);
+  };
+
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
       {/* Top Bar */}
@@ -122,9 +138,16 @@ export const StoryboardEditor = () => {
             >
               <ArrowBack />
             </Box>
-            <Typography variant="h6">
-              Storyboard Editor
+            <Typography variant="h6" sx={{ mr: 1 }}>
+              {projectName}
             </Typography>
+            <IconButton 
+              size="small" 
+              onClick={() => setRenameDialogOpen(true)}
+              sx={{ ml: 1 }}
+            >
+              <Edit fontSize="small" />
+            </IconButton>
           </Box>
 
           <StoryboardToolbar 
@@ -206,6 +229,14 @@ export const StoryboardEditor = () => {
           ))}
         </Box>
       </Container>
+
+      {/* Rename Dialog */}
+      <RenameDialog
+        open={renameDialogOpen}
+        onClose={() => setRenameDialogOpen(false)}
+        onRename={handleRename}
+        currentName={projectName}
+      />
     </Box>
   );
 };

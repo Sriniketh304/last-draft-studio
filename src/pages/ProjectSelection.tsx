@@ -1,11 +1,14 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Plus, FileText } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { ProjectNameDialog } from "@/components/common/ProjectNameDialog";
 
 export const ProjectSelection = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const projectType = location.pathname.split('/')[1]; // screenplay, storyboard, or shotdivision
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const getTitle = () => {
     switch (projectType) {
@@ -17,6 +20,12 @@ export const ProjectSelection = () => {
   };
 
   const handleCreateNew = () => {
+    setDialogOpen(true);
+  };
+
+  const handleProjectSave = (projectName: string) => {
+    // Store project name in localStorage for the editor to pick up
+    localStorage.setItem(`${projectType}_project_name`, projectName);
     navigate(`/${projectType}/editor`);
   };
 
@@ -61,6 +70,14 @@ export const ProjectSelection = () => {
           </div>
         </div>
       </div>
+
+      {/* Project Name Dialog */}
+      <ProjectNameDialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        onSave={handleProjectSave}
+        title={`Create New ${getTitle()}`}
+      />
     </div>
   );
 };
