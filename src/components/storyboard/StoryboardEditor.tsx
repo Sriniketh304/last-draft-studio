@@ -24,12 +24,7 @@ export const StoryboardEditor = () => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentTool, setCurrentTool] = useState<'pen' | 'eraser'>('pen');
   const [currentColor, setCurrentColor] = useState('#000000');
-  const [storyboardPanels, setStoryboardPanels] = useState<Array<{ id: number; canvasRef: React.RefObject<HTMLCanvasElement> }>>([
-    { id: 1, canvasRef: useRef<HTMLCanvasElement>(null) },
-    { id: 2, canvasRef: useRef<HTMLCanvasElement>(null) },
-    { id: 3, canvasRef: useRef<HTMLCanvasElement>(null) },
-    { id: 4, canvasRef: useRef<HTMLCanvasElement>(null) }
-  ]);
+  const mainCanvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const savedProjectName = localStorage.getItem('storyboard_project_name');
@@ -40,45 +35,28 @@ export const StoryboardEditor = () => {
   }, []);
 
   useEffect(() => {
-    storyboardPanels.forEach(panel => {
-      const canvas = panel.canvasRef.current;
-      if (!canvas) return;
+    const canvas = mainCanvasRef.current;
+    if (!canvas) return;
 
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-      canvas.width = 400;
-      canvas.height = 300;
-      
-      ctx.fillStyle = 'white';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-    });
-  }, [storyboardPanels]);
+    canvas.width = 1200;
+    canvas.height = 800;
+    
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }, []);
 
-  const clearCanvas = (panelId?: number) => {
-    if (panelId) {
-      const panel = storyboardPanels.find(p => p.id === panelId);
-      const canvas = panel?.canvasRef.current;
-      if (!canvas) return;
+  const clearCanvas = () => {
+    const canvas = mainCanvasRef.current;
+    if (!canvas) return;
 
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-      ctx.fillStyle = 'white';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-    } else {
-      // Clear all panels
-      storyboardPanels.forEach(panel => {
-        const canvas = panel.canvasRef.current;
-        if (!canvas) return;
-
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-
-        ctx.fillStyle = 'white';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-      });
-    }
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
   };
 
   const importImage = () => {
@@ -93,8 +71,7 @@ export const StoryboardEditor = () => {
       reader.onload = (event) => {
         const img = document.createElement('img');
         img.onload = () => {
-          // Import to first panel for now
-          const canvas = storyboardPanels[0]?.canvasRef.current;
+          const canvas = mainCanvasRef.current;
           if (!canvas) return;
 
           const ctx = canvas.getContext('2d');
@@ -115,11 +92,6 @@ export const StoryboardEditor = () => {
 
   const saveStoryboard = () => {
     console.log("Saving storyboard");
-  };
-
-  const addNewPanel = () => {
-    const newId = Math.max(...storyboardPanels.map(p => p.id)) + 1;
-    setStoryboardPanels(prev => [...prev, { id: newId, canvasRef: useRef<HTMLCanvasElement>(null) }]);
   };
 
   const handleRename = (newName: string) => {
@@ -181,53 +153,32 @@ export const StoryboardEditor = () => {
               Clear All
             </Button>
             
-            <Button 
-              variant="contained" 
-              color="primary" 
-              onClick={addNewPanel}
-              sx={{ textTransform: "none" }}
-            >
-              Add Panel
-            </Button>
           </Box>
         </Container>
       </Paper>
 
-      {/* Storyboard Panels */}
+      {/* Main Storyboard Canvas */}
       <Container sx={{ p: 3 }}>
-        <Box sx={{ 
-          display: "grid", 
-          gridTemplateColumns: "repeat(auto-fit, minmax(420px, 1fr))", 
-          gap: 3,
-          justifyItems: "center"
-        }}>
-          {storyboardPanels.map((panel, index) => (
-            <Paper key={panel.id} elevation={2} sx={{ p: 2, bgcolor: "white", position: "relative" }}>
-              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
-                <Typography variant="subtitle1" fontWeight="medium">
-                  Panel {index + 1}
-                </Typography>
-                <Button 
-                  size="small" 
-                  color="error" 
-                  onClick={() => clearCanvas(panel.id)}
-                  sx={{ textTransform: "none", minWidth: "auto", px: 1 }}
-                >
-                  Clear
-                </Button>
-              </Box>
-              <Box sx={{ border: "2px solid #e0e0e0", borderRadius: 1, overflow: "hidden" }}>
-                <StoryboardCanvas 
-                  ref={panel.canvasRef}
-                  isDrawing={isDrawing}
-                  setIsDrawing={setIsDrawing}
-                  currentTool={currentTool}
-                  currentColor={currentColor}
-                />
-              </Box>
-            </Paper>
-          ))}
-        </Box>
+        <Paper elevation={2} sx={{ p: 3, bgcolor: "white" }}>
+          <Typography variant="h6" sx={{ mb: 2, textAlign: "center" }}>
+            Main Storyboard
+          </Typography>
+          <Box sx={{ 
+            border: "2px solid #e0e0e0", 
+            borderRadius: 1, 
+            overflow: "hidden",
+            display: "flex",
+            justifyContent: "center"
+          }}>
+            <StoryboardCanvas 
+              ref={mainCanvasRef}
+              isDrawing={isDrawing}
+              setIsDrawing={setIsDrawing}
+              currentTool={currentTool}
+              currentColor={currentColor}
+            />
+          </Box>
+        </Paper>
       </Container>
 
       {/* Rename Dialog */}
