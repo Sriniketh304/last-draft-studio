@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   AppBar, 
   Toolbar, 
@@ -11,6 +11,7 @@ import {
 import { ArrowBack } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { ScreenplayToolbar } from "./ScreenplayToolbar";
+import jsPDF from "jspdf";
 
 export const ScreenplayEditor = () => {
   const navigate = useNavigate();
@@ -18,12 +19,60 @@ export const ScreenplayEditor = () => {
   const [scriptTitle, setScriptTitle] = useState("Untitled Script");
   const [isEditingTitle, setIsEditingTitle] = useState(false);
 
+  useEffect(() => {
+    const savedProjectName = localStorage.getItem('screenplay_project_name');
+    if (savedProjectName) {
+      setScriptTitle(savedProjectName);
+      localStorage.removeItem('screenplay_project_name');
+    }
+  }, []);
+
   const handleSave = () => {
     console.log("Saving script:", { title: scriptTitle, content: scriptContent });
   };
 
   const handleExportPDF = () => {
-    console.log("Exporting to PDF");
+    const doc = new jsPDF();
+    const pageHeight = doc.internal.pageSize.height;
+    const pageWidth = doc.internal.pageSize.width;
+    const margin = 20;
+    const lineHeight = 5;
+    let currentY = margin;
+
+    // Set font
+    doc.setFont("courier", "normal");
+    doc.setFontSize(12);
+
+    // Add title
+    doc.setFontSize(16);
+    doc.text(scriptTitle, pageWidth / 2, currentY, { align: "center" });
+    currentY += lineHeight * 3;
+
+    // Add content
+    doc.setFontSize(12);
+    const lines = scriptContent.split('\n');
+    
+    for (let line of lines) {
+      if (currentY > pageHeight - margin) {
+        doc.addPage();
+        currentY = margin;
+      }
+      
+      // Handle long lines by splitting them
+      const splitLines = doc.splitTextToSize(line || " ", pageWidth - 2 * margin);
+      for (let splitLine of splitLines) {
+        if (currentY > pageHeight - margin) {
+          doc.addPage();
+          currentY = margin;
+        }
+        doc.text(splitLine, margin, currentY);
+        currentY += lineHeight;
+      }
+    }
+
+    // Save the PDF
+    const fileName = `${scriptTitle.replace(/\s+/g, '_')}.pdf`;
+    doc.save(fileName);
   };
 
   const handleImportPDF = () => {

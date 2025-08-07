@@ -24,8 +24,8 @@ const App = () => (
           <Route path="/screenplay/editor" element={<ScreenplayEditor />} />
           <Route path="/storyboard" element={<ProjectSelection />} />
           <Route path="/storyboard/editor" element={<StoryboardEditor />} />
-          <Route path="/shotdivision" element={<ProjectSelection />} />
-          <Route path="/shotdivision/editor" element={<ShotDivisionEditor />} />
+          <Route path="/shot-division" element={<ProjectSelection />} />
+          <Route path="/shot-division/editor" element={<ShotDivisionEditor />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
