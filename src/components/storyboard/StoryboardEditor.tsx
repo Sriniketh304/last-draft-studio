@@ -16,7 +16,7 @@ import { StoryboardToolbar } from "./StoryboardToolbar";
 import { StoryboardCanvas } from "./StoryboardCanvas";
 import { DrawingTools } from "./DrawingTools";
 import { ColorPalette } from "./ColorPalette";
-import { FilmFixtures, type Fixture } from "./FilmFixtures";
+import { FilmLibraryDrawer, type FilmFixture } from "./FilmLibraryDrawer";
 
 interface CanvasItem {
   id: string;
@@ -37,6 +37,8 @@ export const StoryboardEditor = () => {
   const [currentTool, setCurrentTool] = useState<'pen' | 'eraser'>('pen');
   const [currentColor, setCurrentColor] = useState('#000000');
   const [canvasItems, setCanvasItems] = useState<CanvasItem[]>([]);
+  const [libraryDrawerOpen, setLibraryDrawerOpen] = useState(false);
+  const [selectedFixture, setSelectedFixture] = useState<FilmFixture | null>(null);
   const mainCanvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -268,7 +270,7 @@ export const StoryboardEditor = () => {
     setCanvasItems([]);
   };
 
-  const addFixtureToCanvas = (fixture: Fixture, x: number = 100, y: number = 100) => {
+  const addFixtureToCanvas = (fixture: FilmFixture, x: number = 100, y: number = 100) => {
     const newItem: CanvasItem = {
       id: `${fixture.id}-${Date.now()}`,
       type: fixture.id,
@@ -277,7 +279,7 @@ export const StoryboardEditor = () => {
       width: fixture.defaultProps.width,
       height: fixture.defaultProps.height,
       color: fixture.defaultProps.color,
-      label: fixture.label
+      label: fixture.name
     };
     
     setCanvasItems(prev => [...prev, newItem]);
@@ -291,7 +293,7 @@ export const StoryboardEditor = () => {
     
     if (fixtureData) {
       try {
-        const fixture: Fixture = JSON.parse(fixtureData);
+        const fixture: FilmFixture = JSON.parse(fixtureData);
         const canvas = mainCanvasRef.current;
         const rect = canvas?.getBoundingClientRect();
         
@@ -402,9 +404,13 @@ export const StoryboardEditor = () => {
               onColorChange={setCurrentColor}
             />
 
-            <FilmFixtures 
-              onFixtureSelect={(fixture) => addFixtureToCanvas(fixture)}
-            />
+            <Button 
+              variant="contained" 
+              onClick={() => setLibraryDrawerOpen(true)}
+              sx={{ textTransform: "none" }}
+            >
+              Open Fixtures Library
+            </Button>
 
             <Button 
               variant="contained" 
@@ -452,6 +458,15 @@ export const StoryboardEditor = () => {
           </Box>
         </Paper>
       </Container>
+
+      {/* Film Library Drawer */}
+      <FilmLibraryDrawer
+        open={libraryDrawerOpen}
+        onClose={() => setLibraryDrawerOpen(false)}
+        onAddFixture={(fixture) => addFixtureToCanvas(fixture)}
+        selectedFixture={selectedFixture}
+        onFixtureSelect={setSelectedFixture}
+      />
 
       {/* Rename Dialog */}
       <RenameDialog
