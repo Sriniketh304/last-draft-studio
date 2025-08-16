@@ -16,6 +16,18 @@ import { StoryboardToolbar } from "./StoryboardToolbar";
 import { StoryboardCanvas } from "./StoryboardCanvas";
 import { DrawingTools } from "./DrawingTools";
 import { ColorPalette } from "./ColorPalette";
+import { FilmFixtures, type Fixture } from "./FilmFixtures";
+
+interface CanvasItem {
+  id: string;
+  type: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  color: string;
+  label: string;
+}
 
 export const StoryboardEditor = () => {
   const navigate = useNavigate();
@@ -24,6 +36,7 @@ export const StoryboardEditor = () => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentTool, setCurrentTool] = useState<'pen' | 'eraser'>('pen');
   const [currentColor, setCurrentColor] = useState('#000000');
+  const [canvasItems, setCanvasItems] = useState<CanvasItem[]>([]);
   const mainCanvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -46,7 +59,39 @@ export const StoryboardEditor = () => {
     
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Redraw all canvas items
+    redrawCanvas();
   }, []);
+
+  // Redraw canvas items when they change
+  useEffect(() => {
+    redrawCanvas();
+  }, [canvasItems]);
+
+  const redrawCanvas = () => {
+    const canvas = mainCanvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Clear and redraw white background
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw all canvas items
+    canvasItems.forEach(item => {
+      ctx.fillStyle = item.color;
+      ctx.fillRect(item.x, item.y, item.width, item.height);
+      
+      // Draw label
+      ctx.fillStyle = '#000';
+      ctx.font = '12px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText(item.label, item.x + item.width / 2, item.y + item.height / 2);
+    });
+  };
 
   const clearCanvas = () => {
     const canvas = mainCanvasRef.current;
@@ -57,6 +102,42 @@ export const StoryboardEditor = () => {
 
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    setCanvasItems([]);
+  };
+
+  const addFixtureToCanvas = (fixture: Fixture, x: number = 100, y: number = 100) => {
+    const newItem: CanvasItem = {
+      id: `${fixture.id}-${Date.now()}`,
+      type: fixture.id,
+      x,
+      y,
+      width: fixture.defaultProps.width,
+      height: fixture.defaultProps.height,
+      color: fixture.defaultProps.color,
+      label: fixture.label
+    };
+    
+    setCanvasItems(prev => [...prev, newItem]);
+  };
+
+  const handleCanvasDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const fixtureData = e.dataTransfer.getData('fixture');
+    
+    if (fixtureData) {
+      const fixture: Fixture = JSON.parse(fixtureData);
+      const rect = mainCanvasRef.current?.getBoundingClientRect();
+      
+      if (rect) {
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        addFixtureToCanvas(fixture, x, y);
+      }
+    }
+  };
+
+  const handleCanvasDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
   };
 
   const importImage = () => {
@@ -144,6 +225,10 @@ export const StoryboardEditor = () => {
               onColorChange={setCurrentColor}
             />
 
+            <FilmFixtures 
+              onFixtureSelect={(fixture) => addFixtureToCanvas(fixture)}
+            />
+
             <Button 
               variant="contained" 
               color="error" 
@@ -163,13 +248,17 @@ export const StoryboardEditor = () => {
           <Typography variant="h6" sx={{ mb: 2, textAlign: "center" }}>
             Main Storyboard
           </Typography>
-          <Box sx={{ 
-            border: "2px solid #e0e0e0", 
-            borderRadius: 1, 
-            overflow: "hidden",
-            display: "flex",
-            justifyContent: "center"
-          }}>
+          <Box 
+            sx={{ 
+              border: "2px solid #e0e0e0", 
+              borderRadius: 1, 
+              overflow: "hidden",
+              display: "flex",
+              justifyContent: "center"
+            }}
+            onDrop={handleCanvasDrop}
+            onDragOver={handleCanvasDragOver}
+          >
             <StoryboardCanvas 
               ref={mainCanvasRef}
               isDrawing={isDrawing}
