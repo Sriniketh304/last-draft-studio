@@ -59,10 +59,14 @@ export const StoryboardCanvas = forwardRef<HTMLCanvasElement, StoryboardCanvasPr
     return (
       <canvas
         ref={ref}
+        width={1200}
+        height={800}
         style={{ 
           border: "1px solid #ddd", 
           borderRadius: "4px", 
-          cursor: "crosshair" 
+          cursor: currentTool === 'pen' ? "crosshair" : currentTool === 'eraser' ? "grab" : "default",
+          maxWidth: "100%",
+          height: "auto"
         }}
         onMouseDown={startDrawing}
         onMouseMove={draw}

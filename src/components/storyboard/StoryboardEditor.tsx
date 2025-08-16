@@ -80,17 +80,180 @@ export const StoryboardEditor = () => {
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Draw all canvas items
+    // Draw all canvas items with SVG-style representations
     canvasItems.forEach(item => {
-      ctx.fillStyle = item.color;
-      ctx.fillRect(item.x, item.y, item.width, item.height);
-      
-      // Draw label
-      ctx.fillStyle = '#000';
-      ctx.font = '12px Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText(item.label, item.x + item.width / 2, item.y + item.height / 2);
+      drawFixtureIcon(ctx, item);
     });
+  };
+
+  const drawFixtureIcon = (ctx: CanvasRenderingContext2D, item: CanvasItem) => {
+    const { x, y, width, height, type, color } = item;
+    
+    ctx.save();
+    ctx.fillStyle = color;
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+
+    switch (type) {
+      case 'actor':
+        // Draw a person shape
+        // Head
+        ctx.beginPath();
+        ctx.arc(x + width/2, y + height/4, width/6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        
+        // Body
+        ctx.beginPath();
+        ctx.rect(x + width/3, y + height/3, width/3, height/2);
+        ctx.fill();
+        ctx.stroke();
+        
+        // Arms
+        ctx.beginPath();
+        ctx.rect(x + width/6, y + height/2.5, width/8, height/3);
+        ctx.rect(x + width*0.75, y + height/2.5, width/8, height/3);
+        ctx.fill();
+        ctx.stroke();
+        
+        // Legs
+        ctx.beginPath();
+        ctx.rect(x + width/2.5, y + height*0.8, width/8, height/5);
+        ctx.rect(x + width*0.6, y + height*0.8, width/8, height/5);
+        ctx.fill();
+        ctx.stroke();
+        break;
+
+      case 'camera':
+        // Draw a camera shape
+        // Main body
+        ctx.beginPath();
+        ctx.roundRect(x + width*0.1, y + height*0.3, width*0.8, height*0.5, 5);
+        ctx.fill();
+        ctx.stroke();
+        
+        // Lens
+        ctx.beginPath();
+        ctx.arc(x + width*0.3, y + height*0.55, width*0.15, 0, Math.PI * 2);
+        ctx.fillStyle = '#333';
+        ctx.fill();
+        ctx.stroke();
+        
+        // Viewfinder
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.rect(x + width*0.6, y + height*0.1, width*0.3, height*0.2);
+        ctx.fill();
+        ctx.stroke();
+        break;
+
+      case 'room':
+        // Draw a room/building shape
+        ctx.beginPath();
+        ctx.rect(x, y + height*0.2, width, height*0.8);
+        ctx.fill();
+        ctx.stroke();
+        
+        // Roof
+        ctx.beginPath();
+        ctx.moveTo(x, y + height*0.2);
+        ctx.lineTo(x + width/2, y);
+        ctx.lineTo(x + width, y + height*0.2);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        
+        // Door
+        ctx.fillStyle = '#8B4513';
+        ctx.beginPath();
+        ctx.rect(x + width*0.4, y + height*0.6, width*0.2, height*0.4);
+        ctx.fill();
+        ctx.stroke();
+        
+        // Window
+        ctx.fillStyle = '#87CEEB';
+        ctx.beginPath();
+        ctx.rect(x + width*0.15, y + height*0.35, width*0.2, width*0.15);
+        ctx.fill();
+        ctx.stroke();
+        break;
+
+      case 'light':
+        // Draw a light bulb shape
+        // Bulb
+        ctx.beginPath();
+        ctx.arc(x + width/2, y + height*0.4, width*0.3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        
+        // Base
+        ctx.beginPath();
+        ctx.rect(x + width*0.35, y + height*0.65, width*0.3, height*0.2);
+        ctx.fill();
+        ctx.stroke();
+        
+        // Light rays
+        ctx.strokeStyle = '#FFD700';
+        ctx.lineWidth = 3;
+        for (let i = 0; i < 8; i++) {
+          const angle = (i * Math.PI * 2) / 8;
+          const startX = x + width/2 + Math.cos(angle) * width*0.35;
+          const startY = y + height*0.4 + Math.sin(angle) * width*0.35;
+          const endX = x + width/2 + Math.cos(angle) * width*0.5;
+          const endY = y + height*0.4 + Math.sin(angle) * width*0.5;
+          
+          ctx.beginPath();
+          ctx.moveTo(startX, startY);
+          ctx.lineTo(endX, endY);
+          ctx.stroke();
+        }
+        break;
+
+      case 'fresnel':
+        // Draw a fresnel light shape
+        // Main body (cylindrical)
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.rect(x + width*0.2, y + height*0.3, width*0.6, height*0.4);
+        ctx.fill();
+        ctx.stroke();
+        
+        // Lens (front circle)
+        ctx.beginPath();
+        ctx.arc(x + width*0.85, y + height*0.5, width*0.15, 0, Math.PI * 2);
+        ctx.fillStyle = '#E6E6FA';
+        ctx.fill();
+        ctx.stroke();
+        
+        // Stand
+        ctx.fillStyle = '#333';
+        ctx.beginPath();
+        ctx.rect(x + width*0.45, y + height*0.7, width*0.1, height*0.3);
+        ctx.fill();
+        ctx.stroke();
+        
+        // Base
+        ctx.beginPath();
+        ctx.rect(x + width*0.2, y + height*0.9, width*0.6, height*0.1);
+        ctx.fill();
+        ctx.stroke();
+        break;
+
+      default:
+        // Fallback rectangle
+        ctx.beginPath();
+        ctx.rect(x, y, width, height);
+        ctx.fill();
+        ctx.stroke();
+    }
+    
+    // Draw label
+    ctx.fillStyle = '#000';
+    ctx.font = 'bold 12px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(item.label, x + width / 2, y + height + 15);
+    
+    ctx.restore();
   };
 
   const clearCanvas = () => {
@@ -122,22 +285,36 @@ export const StoryboardEditor = () => {
 
   const handleCanvasDrop = (e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+    
     const fixtureData = e.dataTransfer.getData('fixture');
     
     if (fixtureData) {
-      const fixture: Fixture = JSON.parse(fixtureData);
-      const rect = mainCanvasRef.current?.getBoundingClientRect();
-      
-      if (rect) {
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        addFixtureToCanvas(fixture, x, y);
+      try {
+        const fixture: Fixture = JSON.parse(fixtureData);
+        const canvas = mainCanvasRef.current;
+        const rect = canvas?.getBoundingClientRect();
+        
+        if (rect && canvas) {
+          // Calculate position relative to canvas, accounting for canvas scaling
+          const scaleX = canvas.width / rect.width;
+          const scaleY = canvas.height / rect.height;
+          
+          const x = (e.clientX - rect.left) * scaleX;
+          const y = (e.clientY - rect.top) * scaleY;
+          
+          addFixtureToCanvas(fixture, x, y);
+        }
+      } catch (error) {
+        console.error('Error parsing fixture data:', error);
       }
     }
   };
 
   const handleCanvasDragOver = (e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+    e.dataTransfer.dropEffect = 'copy';
   };
 
   const importImage = () => {
@@ -250,11 +427,17 @@ export const StoryboardEditor = () => {
           </Typography>
           <Box 
             sx={{ 
-              border: "2px solid #e0e0e0", 
+              border: "2px dashed #e0e0e0", 
               borderRadius: 1, 
               overflow: "hidden",
               display: "flex",
-              justifyContent: "center"
+              justifyContent: "center",
+              minHeight: "500px",
+              backgroundColor: "#fafafa",
+              '&:hover': {
+                borderColor: '#1976d2',
+                backgroundColor: '#f5f5f5'
+              }
             }}
             onDrop={handleCanvasDrop}
             onDragOver={handleCanvasDragOver}

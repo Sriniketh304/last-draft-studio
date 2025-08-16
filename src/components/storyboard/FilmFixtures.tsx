@@ -83,6 +83,24 @@ export const FilmFixtures = ({ onFixtureSelect }: FilmFixturesProps) => {
   const handleDragStart = (e: React.DragEvent, fixture: Fixture) => {
     e.dataTransfer.setData('fixture', JSON.stringify(fixture));
     e.dataTransfer.effectAllowed = 'copy';
+    
+    // Create a visual drag preview
+    const dragImage = document.createElement('div');
+    dragImage.style.padding = '8px';
+    dragImage.style.backgroundColor = fixture.defaultProps.color;
+    dragImage.style.color = 'white';
+    dragImage.style.borderRadius = '4px';
+    dragImage.style.fontSize = '12px';
+    dragImage.innerHTML = fixture.label;
+    dragImage.style.position = 'absolute';
+    dragImage.style.top = '-1000px';
+    document.body.appendChild(dragImage);
+    
+    e.dataTransfer.setDragImage(dragImage, 0, 0);
+    
+    setTimeout(() => {
+      document.body.removeChild(dragImage);
+    }, 0);
   };
 
   return (
@@ -91,7 +109,13 @@ export const FilmFixtures = ({ onFixtureSelect }: FilmFixturesProps) => {
         variant="outlined"
         onClick={handleClick}
         endIcon={<KeyboardArrowDown />}
-        sx={{ textTransform: "none" }}
+        sx={{ 
+          textTransform: "none",
+          '&:hover': {
+            backgroundColor: 'primary.main',
+            color: 'white'
+          }
+        }}
       >
         Add Fixtures
       </Button>
@@ -100,7 +124,12 @@ export const FilmFixtures = ({ onFixtureSelect }: FilmFixturesProps) => {
         open={open}
         onClose={handleClose}
         PaperProps={{
-          sx: { minWidth: 200 }
+          sx: { 
+            minWidth: 200,
+            '& .MuiMenuItem-root': {
+              transition: 'all 0.2s ease-in-out'
+            }
+          }
         }}
       >
         {fixtures.map((fixture) => (
@@ -111,14 +140,26 @@ export const FilmFixtures = ({ onFixtureSelect }: FilmFixturesProps) => {
             onClick={() => handleFixtureSelect(fixture)}
             sx={{ 
               cursor: 'grab',
-              '&:active': { cursor: 'grabbing' }
+              '&:active': { cursor: 'grabbing' },
+              '&:hover': {
+                backgroundColor: 'primary.light',
+                transform: 'scale(1.02)'
+              }
             }}
           >
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Box sx={{ color: fixture.defaultProps.color }}>
+              <Box sx={{ 
+                color: fixture.defaultProps.color,
+                display: 'flex',
+                alignItems: 'center',
+                fontSize: '1.2rem'
+              }}>
                 {fixture.icon}
               </Box>
               <Typography>{fixture.label}</Typography>
+              <Typography variant="caption" sx={{ ml: 'auto', opacity: 0.7 }}>
+                Drag or Click
+              </Typography>
             </Box>
           </MenuItem>
         ))}
