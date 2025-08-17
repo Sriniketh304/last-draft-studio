@@ -63,22 +63,84 @@ export interface FilmFixture {
   description: string;
 }
 
+// Custom SVG Icons matching the reference image style
+const ActorIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <circle cx="12" cy="7" r="4"/>
+    <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/>
+  </svg>
+);
+
+const CameraIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <rect x="2" y="8" width="20" height="10" rx="2"/>
+    <circle cx="12" cy="13" r="3"/>
+    <path d="M18 8V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v2"/>
+  </svg>
+);
+
+const LightIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <rect x="6" y="6" width="12" height="8" rx="1"/>
+    <path d="M12 2v4"/>
+    <path d="M12 18v4"/>
+    <path d="M6 8l-2-2"/>
+    <path d="M20 8l-2-2"/>
+    <path d="M6 16l-2 2"/>
+    <path d="M20 16l-2 2"/>
+  </svg>
+);
+
+const MicIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <rect x="9" y="2" width="6" height="12" rx="3"/>
+    <path d="M5 10v2a7 7 0 0 0 14 0v-2"/>
+    <line x1="12" y1="19" x2="12" y2="23"/>
+    <line x1="8" y1="23" x2="16" y2="23"/>
+  </svg>
+);
+
+const RoomIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+    <polyline points="9,22 9,12 15,12 15,22"/>
+  </svg>
+);
+
+const ChairIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <rect x="6" y="4" width="12" height="8"/>
+    <path d="M6 12v8"/>
+    <path d="M18 12v8"/>
+    <path d="M6 8H4"/>
+    <path d="M20 8h-2"/>
+  </svg>
+);
+
+const TableIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <rect x="4" y="6" width="16" height="4"/>
+    <path d="M6 10v8"/>
+    <path d="M18 10v8"/>
+  </svg>
+);
+
 const filmFixtures: FilmFixture[] = [
   // People
   {
     id: 'actor',
     name: 'Actor',
     category: 'People',
-    icon: <Person />,
-    defaultProps: { width: 50, height: 80, color: '#ff6b6b' },
+    icon: <ActorIcon />,
+    defaultProps: { width: 50, height: 80, color: '#000000' },
     description: 'Main performer in the scene'
   },
   {
     id: 'extra',
     name: 'Background Actor',
     category: 'People',
-    icon: <DirectionsRun />,
-    defaultProps: { width: 45, height: 75, color: '#ff9999' },
+    icon: <ActorIcon />,
+    defaultProps: { width: 45, height: 75, color: '#666666' },
     description: 'Background performer'
   },
   
@@ -87,24 +149,24 @@ const filmFixtures: FilmFixture[] = [
     id: 'camera',
     name: 'Camera',
     category: 'Equipment',
-    icon: <Videocam />,
-    defaultProps: { width: 60, height: 40, color: '#4ecdc4' },
+    icon: <CameraIcon />,
+    defaultProps: { width: 60, height: 40, color: '#000000' },
     description: 'Primary filming camera'
   },
   {
     id: 'camera-b',
     name: 'B-Camera',
     category: 'Equipment',
-    icon: <Movie />,
-    defaultProps: { width: 55, height: 35, color: '#45b7d1' },
+    icon: <CameraIcon />,
+    defaultProps: { width: 55, height: 35, color: '#666666' },
     description: 'Secondary camera angle'
   },
   {
     id: 'microphone',
     name: 'Microphone',
     category: 'Equipment',
-    icon: <Mic />,
-    defaultProps: { width: 25, height: 60, color: '#2d3436' },
+    icon: <MicIcon />,
+    defaultProps: { width: 25, height: 60, color: '#000000' },
     description: 'Audio recording device'
   },
   
@@ -113,24 +175,24 @@ const filmFixtures: FilmFixture[] = [
     id: 'key-light',
     name: 'Key Light',
     category: 'Lighting',
-    icon: <Lightbulb />,
-    defaultProps: { width: 30, height: 40, color: '#f9ca24' },
+    icon: <LightIcon />,
+    defaultProps: { width: 30, height: 40, color: '#2196F3' },
     description: 'Primary lighting source'
   },
   {
     id: 'fill-light',
     name: 'Fill Light',
     category: 'Lighting',
-    icon: <FlashlightOn />,
-    defaultProps: { width: 25, height: 35, color: '#f0932b' },
+    icon: <LightIcon />,
+    defaultProps: { width: 25, height: 35, color: '#2196F3' },
     description: 'Secondary lighting to reduce shadows'
   },
   {
     id: 'fresnel',
     name: 'Fresnel Light',
     category: 'Lighting',
-    icon: <FlashlightOn />,
-    defaultProps: { width: 40, height: 50, color: '#e17055' },
+    icon: <LightIcon />,
+    defaultProps: { width: 40, height: 50, color: '#2196F3' },
     description: 'Focused spotlight with adjustable beam'
   },
   
@@ -139,15 +201,15 @@ const filmFixtures: FilmFixture[] = [
     id: 'room',
     name: 'Room/Building',
     category: 'Set',
-    icon: <Room />,
-    defaultProps: { width: 100, height: 80, color: '#45b7d1' },
+    icon: <RoomIcon />,
+    defaultProps: { width: 100, height: 80, color: '#000000' },
     description: 'Interior or exterior structure'
   },
   {
     id: 'chair',
     name: 'Chair',
     category: 'Set',
-    icon: <Chair />,
+    icon: <ChairIcon />,
     defaultProps: { width: 35, height: 40, color: '#8B4513' },
     description: 'Seating furniture'
   },
@@ -155,7 +217,7 @@ const filmFixtures: FilmFixture[] = [
     id: 'table',
     name: 'Table',
     category: 'Set',
-    icon: <TableRestaurant />,
+    icon: <TableIcon />,
     defaultProps: { width: 60, height: 40, color: '#D2691E' },
     description: 'Table furniture'
   }
