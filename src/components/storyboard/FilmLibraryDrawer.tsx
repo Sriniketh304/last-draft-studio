@@ -63,31 +63,33 @@ export interface FilmFixture {
   description: string;
 }
 
-// Custom SVG Icons matching the reference image style
+// Simple line-based fixture icons matching reference style
 const ActorIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <circle cx="12" cy="7" r="4"/>
+    <circle cx="12" cy="6" r="3"/>
     <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/>
   </svg>
 );
 
 const CameraIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <rect x="2" y="8" width="20" height="10" rx="2"/>
-    <circle cx="12" cy="13" r="3"/>
-    <path d="M18 8V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v2"/>
+    <rect x="3" y="9" width="18" height="8" rx="2"/>
+    <circle cx="12" cy="13" r="2"/>
+    <path d="M7 9V7a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/>
   </svg>
 );
 
 const LightIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <rect x="6" y="6" width="12" height="8" rx="1"/>
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+    <circle cx="12" cy="11" r="4"/>
     <path d="M12 2v4"/>
     <path d="M12 18v4"/>
-    <path d="M6 8l-2-2"/>
-    <path d="M20 8l-2-2"/>
-    <path d="M6 16l-2 2"/>
-    <path d="M20 16l-2 2"/>
+    <path d="M6.93 6.93l2.83 2.83"/>
+    <path d="M14.24 14.24l2.83 2.83"/>
+    <path d="M2 12h4"/>
+    <path d="M18 12h4"/>
+    <path d="M6.93 17.07l2.83-2.83"/>
+    <path d="M14.24 9.76l2.83-2.83"/>
   </svg>
 );
 
@@ -102,18 +104,19 @@ const MicIcon = () => (
 
 const RoomIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-    <polyline points="9,22 9,12 15,12 15,22"/>
+    <rect x="3" y="8" width="18" height="12"/>
+    <path d="M3 8l9-6 9 6"/>
+    <path d="M9 22V12h6v10"/>
   </svg>
 );
 
 const ChairIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <rect x="6" y="4" width="12" height="8"/>
-    <path d="M6 12v8"/>
-    <path d="M18 12v8"/>
-    <path d="M6 8H4"/>
-    <path d="M20 8h-2"/>
+    <rect x="7" y="4" width="10" height="8"/>
+    <path d="M7 12v8"/>
+    <path d="M17 12v8"/>
+    <path d="M7 8H5"/>
+    <path d="M19 8h-2"/>
   </svg>
 );
 
@@ -122,6 +125,16 @@ const TableIcon = () => (
     <rect x="4" y="6" width="16" height="4"/>
     <path d="M6 10v8"/>
     <path d="M18 10v8"/>
+  </svg>
+);
+
+const FresnelIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <rect x="6" y="8" width="12" height="6" rx="1"/>
+    <circle cx="18" cy="11" r="2"/>
+    <path d="M6 11H4"/>
+    <path d="M12 14v6"/>
+    <path d="M8 20h8"/>
   </svg>
 );
 
@@ -191,7 +204,7 @@ const filmFixtures: FilmFixture[] = [
     id: 'fresnel',
     name: 'Fresnel Light',
     category: 'Lighting',
-    icon: <LightIcon />,
+    icon: <FresnelIcon />,
     defaultProps: { width: 40, height: 50, color: '#2196F3' },
     description: 'Focused spotlight with adjustable beam'
   },

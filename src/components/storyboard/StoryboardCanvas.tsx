@@ -5,54 +5,73 @@ interface StoryboardCanvasProps {
   setIsDrawing: (drawing: boolean) => void;
   currentTool: 'pen' | 'eraser';
   currentColor: string;
+  onClick?: (e: React.MouseEvent<HTMLCanvasElement>) => void;
+  onMouseDown?: (e: React.MouseEvent<HTMLCanvasElement>) => void;
+  onMouseMove?: (e: React.MouseEvent<HTMLCanvasElement>) => void;
+  onMouseUp?: (e: React.MouseEvent<HTMLCanvasElement>) => void;
 }
 
 export const StoryboardCanvas = forwardRef<HTMLCanvasElement, StoryboardCanvasProps>(
-  ({ isDrawing, setIsDrawing, currentTool, currentColor }, ref) => {
+  ({ isDrawing, setIsDrawing, currentTool, currentColor, onClick, onMouseDown, onMouseMove, onMouseUp }, ref) => {
     const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
-      const canvas = ref as React.RefObject<HTMLCanvasElement>;
-      if (!canvas.current) return;
-
-      const rect = canvas.current.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      setIsDrawing(true);
+      onMouseDown?.(e);
       
-      const ctx = canvas.current.getContext('2d');
-      if (!ctx) return;
+      if (currentTool === 'pen' || currentTool === 'eraser') {
+        const canvas = ref as React.RefObject<HTMLCanvasElement>;
+        if (!canvas.current) return;
 
-      ctx.beginPath();
-      ctx.moveTo(x, y);
+        const rect = canvas.current.getBoundingClientRect();
+        const scaleX = canvas.current.width / rect.width;
+        const scaleY = canvas.current.height / rect.height;
+        
+        const x = (e.clientX - rect.left) * scaleX;
+        const y = (e.clientY - rect.top) * scaleY;
+
+        setIsDrawing(true);
+        
+        const ctx = canvas.current.getContext('2d');
+        if (!ctx) return;
+
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        
+        if (currentTool === 'pen') {
+          ctx.globalCompositeOperation = 'source-over';
+          ctx.strokeStyle = currentColor;
+        } else {
+          ctx.globalCompositeOperation = 'destination-out';
+          ctx.lineWidth = 10;
+        }
+
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+      }
     };
 
     const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
-      if (!isDrawing) return;
+      onMouseMove?.(e);
+      
+      if (!isDrawing || (currentTool !== 'pen' && currentTool !== 'eraser')) return;
       
       const canvas = ref as React.RefObject<HTMLCanvasElement>;
       if (!canvas.current) return;
 
       const rect = canvas.current.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      const scaleX = canvas.current.width / rect.width;
+      const scaleY = canvas.current.height / rect.height;
+      
+      const x = (e.clientX - rect.left) * scaleX;
+      const y = (e.clientY - rect.top) * scaleY;
 
       const ctx = canvas.current.getContext('2d');
       if (!ctx) return;
-
-      if (currentTool === 'eraser') {
-        ctx.globalCompositeOperation = 'destination-out';
-        ctx.lineWidth = 20;
-      } else {
-        ctx.globalCompositeOperation = 'source-over';
-        ctx.strokeStyle = currentColor;
-        ctx.lineWidth = 2;
-      }
 
       ctx.lineTo(x, y);
       ctx.stroke();
     };
 
-    const stopDrawing = () => {
+    const stopDrawing = (e?: React.MouseEvent<HTMLCanvasElement>) => {
+      if (e) onMouseUp?.(e);
       setIsDrawing(false);
     };
 
@@ -72,6 +91,7 @@ export const StoryboardCanvas = forwardRef<HTMLCanvasElement, StoryboardCanvasPr
         onMouseMove={draw}
         onMouseUp={stopDrawing}
         onMouseLeave={stopDrawing}
+        onClick={onClick}
       />
     );
   }

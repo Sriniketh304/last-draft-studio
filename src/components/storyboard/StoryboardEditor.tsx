@@ -27,6 +27,8 @@ interface CanvasItem {
   height: number;
   color: string;
   label: string;
+  rotation: number;
+  selected: boolean;
 }
 
 export const StoryboardEditor = () => {
@@ -39,6 +41,8 @@ export const StoryboardEditor = () => {
   const [canvasItems, setCanvasItems] = useState<CanvasItem[]>([]);
   const [libraryDrawerOpen, setLibraryDrawerOpen] = useState(false);
   const [selectedFixture, setSelectedFixture] = useState<FilmFixture | null>(null);
+  const [draggedItem, setDraggedItem] = useState<CanvasItem | null>(null);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const mainCanvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -89,173 +93,249 @@ export const StoryboardEditor = () => {
   };
 
   const drawFixtureIcon = (ctx: CanvasRenderingContext2D, item: CanvasItem) => {
-    const { x, y, width, height, type, color } = item;
+    const { x, y, width, height, type, color, rotation, selected } = item;
     
     ctx.save();
-    ctx.fillStyle = color;
+    
+    // Apply rotation
+    ctx.translate(x + width/2, y + height/2);
+    ctx.rotate(rotation * Math.PI / 180);
+    ctx.translate(-width/2, -height/2);
+    
     ctx.strokeStyle = '#333';
     ctx.lineWidth = 2;
 
+    // Draw simple line-based fixtures matching reference style
     switch (type) {
       case 'actor':
-        // Draw a person shape
+        // Simple person silhouette
+        ctx.fillStyle = color;
+        ctx.strokeStyle = '#000';
+        
         // Head
         ctx.beginPath();
-        ctx.arc(x + width/2, y + height/4, width/6, 0, Math.PI * 2);
+        ctx.arc(width/2, height/5, width/8, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
         
         // Body
         ctx.beginPath();
-        ctx.rect(x + width/3, y + height/3, width/3, height/2);
-        ctx.fill();
+        ctx.moveTo(width/2, height/5 + width/8);
+        ctx.lineTo(width/2, height*0.7);
         ctx.stroke();
         
         // Arms
         ctx.beginPath();
-        ctx.rect(x + width/6, y + height/2.5, width/8, height/3);
-        ctx.rect(x + width*0.75, y + height/2.5, width/8, height/3);
-        ctx.fill();
+        ctx.moveTo(width/3, height*0.4);
+        ctx.lineTo(width*2/3, height*0.4);
         ctx.stroke();
         
         // Legs
         ctx.beginPath();
-        ctx.rect(x + width/2.5, y + height*0.8, width/8, height/5);
-        ctx.rect(x + width*0.6, y + height*0.8, width/8, height/5);
-        ctx.fill();
+        ctx.moveTo(width/2, height*0.7);
+        ctx.lineTo(width/3, height*0.9);
+        ctx.moveTo(width/2, height*0.7);
+        ctx.lineTo(width*2/3, height*0.9);
         ctx.stroke();
         break;
 
       case 'camera':
-        // Draw a camera shape
-        // Main body
+        ctx.fillStyle = color;
+        ctx.strokeStyle = '#000';
+        
+        // Camera body
         ctx.beginPath();
-        ctx.roundRect(x + width*0.1, y + height*0.3, width*0.8, height*0.5, 5);
+        ctx.rect(width*0.15, height*0.3, width*0.7, height*0.4);
         ctx.fill();
         ctx.stroke();
         
         // Lens
         ctx.beginPath();
-        ctx.arc(x + width*0.3, y + height*0.55, width*0.15, 0, Math.PI * 2);
-        ctx.fillStyle = '#333';
-        ctx.fill();
+        ctx.arc(width*0.3, height*0.5, width*0.1, 0, Math.PI * 2);
         ctx.stroke();
         
         // Viewfinder
-        ctx.fillStyle = color;
         ctx.beginPath();
-        ctx.rect(x + width*0.6, y + height*0.1, width*0.3, height*0.2);
-        ctx.fill();
+        ctx.rect(width*0.6, height*0.15, width*0.25, height*0.15);
         ctx.stroke();
         break;
 
       case 'room':
-        // Draw a room/building shape
+        ctx.fillStyle = color;
+        ctx.strokeStyle = '#000';
+        
+        // Building body
         ctx.beginPath();
-        ctx.rect(x, y + height*0.2, width, height*0.8);
+        ctx.rect(0, height*0.3, width, height*0.7);
         ctx.fill();
         ctx.stroke();
         
         // Roof
         ctx.beginPath();
-        ctx.moveTo(x, y + height*0.2);
-        ctx.lineTo(x + width/2, y);
-        ctx.lineTo(x + width, y + height*0.2);
+        ctx.moveTo(0, height*0.3);
+        ctx.lineTo(width/2, height*0.1);
+        ctx.lineTo(width, height*0.3);
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
         
         // Door
-        ctx.fillStyle = '#8B4513';
         ctx.beginPath();
-        ctx.rect(x + width*0.4, y + height*0.6, width*0.2, height*0.4);
-        ctx.fill();
-        ctx.stroke();
-        
-        // Window
-        ctx.fillStyle = '#87CEEB';
-        ctx.beginPath();
-        ctx.rect(x + width*0.15, y + height*0.35, width*0.2, width*0.15);
-        ctx.fill();
+        ctx.rect(width*0.4, height*0.6, width*0.2, height*0.4);
         ctx.stroke();
         break;
 
+      case 'key-light':
+      case 'fill-light':
       case 'light':
-        // Draw a light bulb shape
-        // Bulb
-        ctx.beginPath();
-        ctx.arc(x + width/2, y + height*0.4, width*0.3, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
+        ctx.fillStyle = color;
+        ctx.strokeStyle = '#000';
         
-        // Base
+        // Light bulb
         ctx.beginPath();
-        ctx.rect(x + width*0.35, y + height*0.65, width*0.3, height*0.2);
-        ctx.fill();
+        ctx.arc(width/2, height*0.4, width*0.2, 0, Math.PI * 2);
         ctx.stroke();
         
         // Light rays
-        ctx.strokeStyle = '#FFD700';
-        ctx.lineWidth = 3;
         for (let i = 0; i < 8; i++) {
           const angle = (i * Math.PI * 2) / 8;
-          const startX = x + width/2 + Math.cos(angle) * width*0.35;
-          const startY = y + height*0.4 + Math.sin(angle) * width*0.35;
-          const endX = x + width/2 + Math.cos(angle) * width*0.5;
-          const endY = y + height*0.4 + Math.sin(angle) * width*0.5;
+          const startX = width/2 + Math.cos(angle) * width*0.25;
+          const startY = height*0.4 + Math.sin(angle) * width*0.25;
+          const endX = width/2 + Math.cos(angle) * width*0.35;
+          const endY = height*0.4 + Math.sin(angle) * width*0.35;
           
           ctx.beginPath();
           ctx.moveTo(startX, startY);
           ctx.lineTo(endX, endY);
           ctx.stroke();
         }
+        
+        // Base
+        ctx.beginPath();
+        ctx.moveTo(width/2, height*0.6);
+        ctx.lineTo(width/2, height*0.8);
+        ctx.stroke();
         break;
 
       case 'fresnel':
-        // Draw a fresnel light shape
-        // Main body (cylindrical)
         ctx.fillStyle = color;
+        ctx.strokeStyle = '#000';
+        
+        // Main body
         ctx.beginPath();
-        ctx.rect(x + width*0.2, y + height*0.3, width*0.6, height*0.4);
+        ctx.rect(width*0.2, height*0.3, width*0.6, height*0.3);
         ctx.fill();
         ctx.stroke();
         
-        // Lens (front circle)
+        // Lens
         ctx.beginPath();
-        ctx.arc(x + width*0.85, y + height*0.5, width*0.15, 0, Math.PI * 2);
-        ctx.fillStyle = '#E6E6FA';
+        ctx.arc(width*0.8, height*0.45, width*0.1, 0, Math.PI * 2);
+        ctx.stroke();
+        
+        // Stand
+        ctx.beginPath();
+        ctx.moveTo(width/2, height*0.6);
+        ctx.lineTo(width/2, height*0.85);
+        ctx.moveTo(width*0.3, height*0.85);
+        ctx.lineTo(width*0.7, height*0.85);
+        ctx.stroke();
+        break;
+
+      case 'microphone':
+        ctx.fillStyle = color;
+        ctx.strokeStyle = '#000';
+        
+        // Mic capsule
+        ctx.beginPath();
+        ctx.rect(width*0.4, height*0.1, width*0.2, height*0.4);
         ctx.fill();
         ctx.stroke();
         
         // Stand
-        ctx.fillStyle = '#333';
         ctx.beginPath();
-        ctx.rect(x + width*0.45, y + height*0.7, width*0.1, height*0.3);
+        ctx.moveTo(width/2, height*0.5);
+        ctx.lineTo(width/2, height*0.8);
+        ctx.moveTo(width*0.3, height*0.8);
+        ctx.lineTo(width*0.7, height*0.8);
+        ctx.stroke();
+        break;
+
+      case 'chair':
+        ctx.fillStyle = color;
+        ctx.strokeStyle = '#000';
+        
+        // Seat
+        ctx.beginPath();
+        ctx.rect(width*0.2, height*0.4, width*0.6, width*0.1);
         ctx.fill();
         ctx.stroke();
         
-        // Base
+        // Back
         ctx.beginPath();
-        ctx.rect(x + width*0.2, y + height*0.9, width*0.6, height*0.1);
+        ctx.rect(width*0.2, height*0.2, width*0.1, height*0.3);
         ctx.fill();
+        ctx.stroke();
+        
+        // Legs
+        ctx.beginPath();
+        ctx.moveTo(width*0.25, height*0.5);
+        ctx.lineTo(width*0.25, height*0.8);
+        ctx.moveTo(width*0.75, height*0.5);
+        ctx.lineTo(width*0.75, height*0.8);
+        ctx.stroke();
+        break;
+
+      case 'table':
+        ctx.fillStyle = color;
+        ctx.strokeStyle = '#000';
+        
+        // Table top
+        ctx.beginPath();
+        ctx.rect(width*0.1, height*0.3, width*0.8, height*0.1);
+        ctx.fill();
+        ctx.stroke();
+        
+        // Legs
+        ctx.beginPath();
+        ctx.moveTo(width*0.2, height*0.4);
+        ctx.lineTo(width*0.2, height*0.8);
+        ctx.moveTo(width*0.8, height*0.4);
+        ctx.lineTo(width*0.8, height*0.8);
         ctx.stroke();
         break;
 
       default:
         // Fallback rectangle
         ctx.beginPath();
-        ctx.rect(x, y, width, height);
+        ctx.rect(0, 0, width, height);
         ctx.fill();
         ctx.stroke();
     }
     
-    // Draw label
+    // Draw selection border if selected
+    if (selected) {
+      ctx.strokeStyle = '#2196F3';
+      ctx.lineWidth = 3;
+      ctx.setLineDash([5, 5]);
+      ctx.beginPath();
+      ctx.rect(-5, -5, width + 10, height + 10);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      
+      // Draw rotation handle
+      ctx.fillStyle = '#2196F3';
+      ctx.beginPath();
+      ctx.arc(width/2, -15, 5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    
+    ctx.restore();
+    
+    // Draw label below the item (not rotated)
     ctx.fillStyle = '#000';
     ctx.font = 'bold 12px Arial';
     ctx.textAlign = 'center';
     ctx.fillText(item.label, x + width / 2, y + height + 15);
-    
-    ctx.restore();
   };
 
   const clearCanvas = () => {
@@ -279,11 +359,128 @@ export const StoryboardEditor = () => {
       width: fixture.defaultProps.width,
       height: fixture.defaultProps.height,
       color: fixture.defaultProps.color,
-      label: fixture.name
+      label: fixture.name,
+      rotation: 0,
+      selected: false
     };
     
     setCanvasItems(prev => [...prev, newItem]);
   };
+
+  const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = mainCanvasRef.current;
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    const clickX = (e.clientX - rect.left) * scaleX;
+    const clickY = (e.clientY - rect.top) * scaleY;
+
+    // Check if clicking on an item
+    let clickedItem: CanvasItem | null = null;
+    for (let i = canvasItems.length - 1; i >= 0; i--) {
+      const item = canvasItems[i];
+      if (clickX >= item.x && clickX <= item.x + item.width &&
+          clickY >= item.y && clickY <= item.y + item.height) {
+        clickedItem = item;
+        break;
+      }
+    }
+
+    // Update selection
+    setCanvasItems(prev => prev.map(item => ({
+      ...item,
+      selected: item === clickedItem
+    })));
+  };
+
+  const handleCanvasMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (currentTool !== 'pen' && currentTool !== 'eraser') {
+      const canvas = mainCanvasRef.current;
+      if (!canvas) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      
+      const mouseX = (e.clientX - rect.left) * scaleX;
+      const mouseY = (e.clientY - rect.top) * scaleY;
+
+      // Check if clicking on an item
+      for (let i = canvasItems.length - 1; i >= 0; i--) {
+        const item = canvasItems[i];
+        if (mouseX >= item.x && mouseX <= item.x + item.width &&
+            mouseY >= item.y && mouseY <= item.y + item.height) {
+          
+          // Check if clicking on rotation handle
+          const centerX = item.x + item.width / 2;
+          const handleY = item.y - 15;
+          const distToHandle = Math.sqrt((mouseX - centerX) ** 2 + (mouseY - handleY) ** 2);
+          
+          if (item.selected && distToHandle <= 8) {
+            // Start rotation
+            return;
+          }
+          
+          setDraggedItem(item);
+          setDragOffset({
+            x: mouseX - item.x,
+            y: mouseY - item.y
+          });
+          break;
+        }
+      }
+    }
+  };
+
+  const handleCanvasMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (draggedItem && currentTool !== 'pen' && currentTool !== 'eraser') {
+      const canvas = mainCanvasRef.current;
+      if (!canvas) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      
+      const mouseX = (e.clientX - rect.left) * scaleX;
+      const mouseY = (e.clientY - rect.top) * scaleY;
+
+      const newX = mouseX - dragOffset.x;
+      const newY = mouseY - dragOffset.y;
+
+      setCanvasItems(prev => prev.map(item => 
+        item.id === draggedItem.id 
+          ? { ...item, x: newX, y: newY }
+          : item
+      ));
+    }
+  };
+
+  const handleCanvasMouseUp = () => {
+    setDraggedItem(null);
+  };
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    const selectedItem = canvasItems.find(item => item.selected);
+    if (!selectedItem) return;
+
+    if (e.key === 'Delete' || e.key === 'Backspace') {
+      setCanvasItems(prev => prev.filter(item => !item.selected));
+    } else if (e.key === 'r' || e.key === 'R') {
+      setCanvasItems(prev => prev.map(item => 
+        item.selected 
+          ? { ...item, rotation: (item.rotation + 15) % 360 }
+          : item
+      ));
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [canvasItems]);
 
   const handleCanvasDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -454,6 +651,10 @@ export const StoryboardEditor = () => {
               setIsDrawing={setIsDrawing}
               currentTool={currentTool}
               currentColor={currentColor}
+              onClick={handleCanvasClick}
+              onMouseDown={handleCanvasMouseDown}
+              onMouseMove={handleCanvasMouseMove}
+              onMouseUp={handleCanvasMouseUp}
             />
           </Box>
         </Paper>
