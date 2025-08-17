@@ -36,7 +36,7 @@ export const StoryboardEditor = () => {
   const [projectName, setProjectName] = useState("Untitled Storyboard");
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [currentTool, setCurrentTool] = useState<'pen' | 'eraser'>('pen');
+  const [currentTool, setCurrentTool] = useState<'select' | 'pen' | 'eraser'>('select');
   const [currentColor, setCurrentColor] = useState('#000000');
   const [canvasItems, setCanvasItems] = useState<CanvasItem[]>([]);
   const [libraryDrawerOpen, setLibraryDrawerOpen] = useState(false);
@@ -368,6 +368,8 @@ export const StoryboardEditor = () => {
   };
 
   const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (currentTool === 'pen' || currentTool === 'eraser') return; // Don't handle clicks when drawing
+    
     const canvas = mainCanvasRef.current;
     if (!canvas) return;
 
@@ -389,7 +391,7 @@ export const StoryboardEditor = () => {
       }
     }
 
-    // Update selection
+    // Update selection - clear all selections first, then select clicked item
     setCanvasItems(prev => prev.map(item => ({
       ...item,
       selected: item === clickedItem
@@ -397,46 +399,57 @@ export const StoryboardEditor = () => {
   };
 
   const handleCanvasMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (currentTool !== 'pen' && currentTool !== 'eraser') {
-      const canvas = mainCanvasRef.current;
-      if (!canvas) return;
+    if (currentTool === 'pen' || currentTool === 'eraser') return; // Don't handle fixture interaction when drawing
+    
+    const canvas = mainCanvasRef.current;
+    if (!canvas) return;
 
-      const rect = canvas.getBoundingClientRect();
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
-      
-      const mouseX = (e.clientX - rect.left) * scaleX;
-      const mouseY = (e.clientY - rect.top) * scaleY;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    const mouseX = (e.clientX - rect.left) * scaleX;
+    const mouseY = (e.clientY - rect.top) * scaleY;
 
-      // Check if clicking on an item
-      for (let i = canvasItems.length - 1; i >= 0; i--) {
-        const item = canvasItems[i];
-        if (mouseX >= item.x && mouseX <= item.x + item.width &&
-            mouseY >= item.y && mouseY <= item.y + item.height) {
-          
-          // Check if clicking on rotation handle
+    // Check if clicking on an item
+    for (let i = canvasItems.length - 1; i >= 0; i--) {
+      const item = canvasItems[i];
+      if (mouseX >= item.x && mouseX <= item.x + item.width &&
+          mouseY >= item.y && mouseY <= item.y + item.height) {
+        
+        // Check if clicking on rotation handle (only if item is selected)
+        if (item.selected) {
           const centerX = item.x + item.width / 2;
           const handleY = item.y - 15;
           const distToHandle = Math.sqrt((mouseX - centerX) ** 2 + (mouseY - handleY) ** 2);
           
-          if (item.selected && distToHandle <= 8) {
-            // Start rotation
+          if (distToHandle <= 8) {
+            // Start rotation mode - could implement click-drag rotation here
             return;
           }
-          
-          setDraggedItem(item);
-          setDragOffset({
-            x: mouseX - item.x,
-            y: mouseY - item.y
-          });
-          break;
         }
+        
+        // Select the item if not selected
+        if (!item.selected) {
+          setCanvasItems(prev => prev.map(i => ({
+            ...i,
+            selected: i.id === item.id
+          })));
+        }
+        
+        // Start dragging
+        setDraggedItem(item);
+        setDragOffset({
+          x: mouseX - item.x,
+          y: mouseY - item.y
+        });
+        break;
       }
     }
   };
 
   const handleCanvasMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (draggedItem && currentTool !== 'pen' && currentTool !== 'eraser') {
+    if (draggedItem && currentTool === 'select') {
       const canvas = mainCanvasRef.current;
       if (!canvas) return;
 

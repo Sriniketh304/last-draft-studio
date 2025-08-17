@@ -3,7 +3,7 @@ import { forwardRef } from "react";
 interface StoryboardCanvasProps {
   isDrawing: boolean;
   setIsDrawing: (drawing: boolean) => void;
-  currentTool: 'pen' | 'eraser';
+  currentTool: 'select' | 'pen' | 'eraser';
   currentColor: string;
   onClick?: (e: React.MouseEvent<HTMLCanvasElement>) => void;
   onMouseDown?: (e: React.MouseEvent<HTMLCanvasElement>) => void;
@@ -80,12 +80,13 @@ export const StoryboardCanvas = forwardRef<HTMLCanvasElement, StoryboardCanvasPr
         ref={ref}
         width={1200}
         height={800}
-        style={{ 
-          border: "1px solid #ddd", 
-          borderRadius: "4px", 
-          cursor: currentTool === 'pen' ? "crosshair" : currentTool === 'eraser' ? "grab" : "default",
+        style={{
+          border: "1px solid #ccc",
+          borderRadius: "4px",
           maxWidth: "100%",
-          height: "auto"
+          height: "auto",
+          cursor: currentTool === 'select' ? 'default' : 
+                 currentTool === 'pen' ? 'crosshair' : 'crosshair'
         }}
         onMouseDown={startDrawing}
         onMouseMove={draw}

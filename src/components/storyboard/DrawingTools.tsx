@@ -1,35 +1,62 @@
-import { Button, ButtonGroup, Box, Typography } from "@mui/material";
-import { Brush, Delete } from "@mui/icons-material";
+import { Box, Button, Typography } from "@mui/material";
+import { Edit, Clear, PanTool } from "@mui/icons-material";
 
 interface DrawingToolsProps {
-  currentTool: 'pen' | 'eraser';
-  onToolChange: (tool: 'pen' | 'eraser') => void;
+  currentTool: 'select' | 'pen' | 'eraser';
+  onToolChange: (tool: 'select' | 'pen' | 'eraser') => void;
 }
 
 export const DrawingTools = ({ currentTool, onToolChange }: DrawingToolsProps) => {
   return (
-    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-      <Typography variant="subtitle2" fontWeight="medium">
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+      <Typography variant="body2" sx={{ mr: 1, fontWeight: "medium" }}>
         Tools:
       </Typography>
-      <ButtonGroup variant="outlined" size="small">
-        <Button
-          variant={currentTool === 'pen' ? 'contained' : 'outlined'}
-          startIcon={<Brush />}
-          onClick={() => onToolChange('pen')}
-          sx={{ textTransform: "none" }}
-        >
-          Draw
-        </Button>
-        <Button
-          variant={currentTool === 'eraser' ? 'contained' : 'outlined'}
-          startIcon={<Delete />}
-          onClick={() => onToolChange('eraser')}
-          sx={{ textTransform: "none" }}
-        >
-          Eraser
-        </Button>
-      </ButtonGroup>
+      
+      <Button
+        variant={currentTool === 'select' ? "contained" : "outlined"}
+        size="small"
+        onClick={() => onToolChange('select')}
+        startIcon={<PanTool />}
+        sx={{ 
+          textTransform: "none",
+          minWidth: "auto",
+          bgcolor: currentTool === 'select' ? 'primary.main' : 'transparent',
+          color: currentTool === 'select' ? 'white' : 'primary.main'
+        }}
+      >
+        Select
+      </Button>
+      
+      <Button
+        variant={currentTool === 'pen' ? "contained" : "outlined"}
+        size="small"
+        onClick={() => onToolChange('pen')}
+        startIcon={<Edit />}
+        sx={{ 
+          textTransform: "none",
+          minWidth: "auto",
+          bgcolor: currentTool === 'pen' ? 'primary.main' : 'transparent',
+          color: currentTool === 'pen' ? 'white' : 'primary.main'
+        }}
+      >
+        Draw
+      </Button>
+
+      <Button
+        variant={currentTool === 'eraser' ? "contained" : "outlined"}
+        size="small"
+        onClick={() => onToolChange('eraser')}
+        startIcon={<Clear />}
+        sx={{ 
+          textTransform: "none",
+          minWidth: "auto",
+          bgcolor: currentTool === 'eraser' ? 'primary.main' : 'transparent',
+          color: currentTool === 'eraser' ? 'white' : 'primary.main'
+        }}
+      >
+        Erase
+      </Button>
     </Box>
   );
 };
