@@ -1,6 +1,10 @@
 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
   <path d="M5 17h14l2-8H3l2 8z" stroke="currentColor" stroke-width="2" fill="none"/>
-  <circle cx="7" cy="19" r="2" stroke="currentColor" stroke-width="2" fill="none"/>
-  <circle cx="17" cy="19" r="2" stroke="currentColor" stroke-width="2" fill="none"/>
+  <circle cx="7" cy="19" r="2" stroke="currentColor" stroke-width="2" fill="none">
+    <animateTransform attributeName="transform" type="rotate" values="0 7 19;360 7 19" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="17" cy="19" r="2" stroke="currentColor" stroke-width="2" fill="none">
+    <animateTransform attributeName="transform" type="rotate" values="0 17 19;360 17 19" dur="2s" repeatCount="indefinite"/>
+  </circle>
   <path d="M5 17V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v10" stroke="currentColor" stroke-width="2" fill="none"/>
 </svg>

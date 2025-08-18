@@ -43,6 +43,9 @@ export const StoryboardEditor = () => {
   const [selectedFixture, setSelectedFixture] = useState<FilmFixture | null>(null);
   const [draggedItem, setDraggedItem] = useState<CanvasItem | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [resizingItem, setResizingItem] = useState<CanvasItem | null>(null);
+  const [resizeOffset, setResizeOffset] = useState({ x: 0, y: 0 });
+  const [rotatingItem, setRotatingItem] = useState<CanvasItem | null>(null);
   const mainCanvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -327,6 +330,12 @@ export const StoryboardEditor = () => {
       ctx.beginPath();
       ctx.arc(width/2, -15, 5, 0, Math.PI * 2);
       ctx.fill();
+      
+      // Draw resize handle (bottom-right corner)
+      ctx.fillStyle = '#2196F3';
+      ctx.beginPath();
+      ctx.rect(width - 4, height - 4, 8, 8);
+      ctx.fill();
     }
     
     ctx.restore();
@@ -417,14 +426,30 @@ export const StoryboardEditor = () => {
       if (mouseX >= item.x && mouseX <= item.x + item.width &&
           mouseY >= item.y && mouseY <= item.y + item.height) {
         
-        // Check if clicking on rotation handle (only if item is selected)
+        // Check if clicking on resize handles (only if item is selected)
         if (item.selected) {
+          const resizeHandleSize = 8;
+          
+          // Bottom-right resize handle
+          const resizeHandleX = item.x + item.width - resizeHandleSize / 2;
+          const resizeHandleY = item.y + item.height - resizeHandleSize / 2;
+          if (mouseX >= resizeHandleX && mouseX <= resizeHandleX + resizeHandleSize &&
+              mouseY >= resizeHandleY && mouseY <= resizeHandleY + resizeHandleSize) {
+            setResizingItem(item);
+            setResizeOffset({
+              x: mouseX - (item.x + item.width),
+              y: mouseY - (item.y + item.height)
+            });
+            return;
+          }
+          
+          // Rotation handle
           const centerX = item.x + item.width / 2;
           const handleY = item.y - 15;
           const distToHandle = Math.sqrt((mouseX - centerX) ** 2 + (mouseY - handleY) ** 2);
           
           if (distToHandle <= 8) {
-            // Start rotation mode - could implement click-drag rotation here
+            setRotatingItem(item);
             return;
           }
         }
@@ -449,17 +474,20 @@ export const StoryboardEditor = () => {
   };
 
   const handleCanvasMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (draggedItem && currentTool === 'select') {
-      const canvas = mainCanvasRef.current;
-      if (!canvas) return;
+    if (currentTool !== 'select') return;
+    
+    const canvas = mainCanvasRef.current;
+    if (!canvas) return;
 
-      const rect = canvas.getBoundingClientRect();
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
-      
-      const mouseX = (e.clientX - rect.left) * scaleX;
-      const mouseY = (e.clientY - rect.top) * scaleY;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    const mouseX = (e.clientX - rect.left) * scaleX;
+    const mouseY = (e.clientY - rect.top) * scaleY;
 
+    // Handle dragging
+    if (draggedItem) {
       const newX = mouseX - dragOffset.x;
       const newY = mouseY - dragOffset.y;
 
@@ -469,10 +497,38 @@ export const StoryboardEditor = () => {
           : item
       ));
     }
+    
+    // Handle resizing
+    if (resizingItem) {
+      const newWidth = Math.max(20, mouseX - resizingItem.x - resizeOffset.x);
+      const newHeight = Math.max(20, mouseY - resizingItem.y - resizeOffset.y);
+
+      setCanvasItems(prev => prev.map(item => 
+        item.id === resizingItem.id 
+          ? { ...item, width: newWidth, height: newHeight }
+          : item
+      ));
+    }
+    
+    // Handle rotation
+    if (rotatingItem) {
+      const centerX = rotatingItem.x + rotatingItem.width / 2;
+      const centerY = rotatingItem.y + rotatingItem.height / 2;
+      const angle = Math.atan2(mouseY - centerY, mouseX - centerX);
+      const rotation = (angle * 180 / Math.PI + 90) % 360;
+
+      setCanvasItems(prev => prev.map(item => 
+        item.id === rotatingItem.id 
+          ? { ...item, rotation: rotation }
+          : item
+      ));
+    }
   };
 
   const handleCanvasMouseUp = () => {
     setDraggedItem(null);
+    setResizingItem(null);
+    setRotatingItem(null);
   };
 
   const handleKeyDown = (e: KeyboardEvent) => {
