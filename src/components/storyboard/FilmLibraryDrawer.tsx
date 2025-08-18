@@ -19,19 +19,18 @@ import {
 import {
   Search,
   Close,
-  Add,
-  SwapHoriz,
-  Person,
-  Videocam,
-  Room,
-  Lightbulb,
-  FlashlightOn,
-  Movie,
-  Mic,
-  DirectionsRun,
-  Chair,
-  TableRestaurant
+  Add
 } from "@mui/icons-material";
+
+// Import SVG assets
+import ActorIcon from '/src/assets/fixtures/actor.svg';
+import CameraIcon from '/src/assets/fixtures/camera.svg';
+import LightIcon from '/src/assets/fixtures/light.svg';
+import FresnelLightIcon from '/src/assets/fixtures/fresnel-light.svg';
+import RoomIcon from '/src/assets/fixtures/room.svg';
+import PropIcon from '/src/assets/fixtures/prop.svg';
+import VehicleIcon from '/src/assets/fixtures/vehicle.svg';
+import EquipmentIcon from '/src/assets/fixtures/equipment.svg';
 
 // Simple debounce hook implementation
 function useDebounce<T>(value: T, delay: number): [T] {
@@ -63,79 +62,9 @@ export interface FilmFixture {
   description: string;
 }
 
-// Simple line-based fixture icons matching reference style
-const ActorIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <circle cx="12" cy="6" r="3"/>
-    <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/>
-  </svg>
-);
-
-const CameraIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <rect x="3" y="9" width="18" height="8" rx="2"/>
-    <circle cx="12" cy="13" r="2"/>
-    <path d="M7 9V7a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/>
-  </svg>
-);
-
-const LightIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-    <circle cx="12" cy="11" r="4"/>
-    <path d="M12 2v4"/>
-    <path d="M12 18v4"/>
-    <path d="M6.93 6.93l2.83 2.83"/>
-    <path d="M14.24 14.24l2.83 2.83"/>
-    <path d="M2 12h4"/>
-    <path d="M18 12h4"/>
-    <path d="M6.93 17.07l2.83-2.83"/>
-    <path d="M14.24 9.76l2.83-2.83"/>
-  </svg>
-);
-
-const MicIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <rect x="9" y="2" width="6" height="12" rx="3"/>
-    <path d="M5 10v2a7 7 0 0 0 14 0v-2"/>
-    <line x1="12" y1="19" x2="12" y2="23"/>
-    <line x1="8" y1="23" x2="16" y2="23"/>
-  </svg>
-);
-
-const RoomIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <rect x="3" y="8" width="18" height="12"/>
-    <path d="M3 8l9-6 9 6"/>
-    <path d="M9 22V12h6v10"/>
-  </svg>
-);
-
-const ChairIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <rect x="7" y="4" width="10" height="8"/>
-    <path d="M7 12v8"/>
-    <path d="M17 12v8"/>
-    <path d="M7 8H5"/>
-    <path d="M19 8h-2"/>
-  </svg>
-);
-
-const TableIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <rect x="4" y="6" width="16" height="4"/>
-    <path d="M6 10v8"/>
-    <path d="M18 10v8"/>
-  </svg>
-);
-
-const FresnelIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <rect x="6" y="8" width="12" height="6" rx="1"/>
-    <circle cx="18" cy="11" r="2"/>
-    <path d="M6 11H4"/>
-    <path d="M12 14v6"/>
-    <path d="M8 20h8"/>
-  </svg>
+// SVG Icon component wrapper
+const IconWrapper = ({ src, alt }: { src: string; alt: string }) => (
+  <img src={src} alt={alt} width="24" height="24" style={{ color: 'currentColor' }} />
 );
 
 const filmFixtures: FilmFixture[] = [
@@ -144,7 +73,7 @@ const filmFixtures: FilmFixture[] = [
     id: 'actor',
     name: 'Actor',
     category: 'People',
-    icon: <ActorIcon />,
+    icon: <IconWrapper src={ActorIcon} alt="Actor" />,
     defaultProps: { width: 50, height: 80, color: '#000000' },
     description: 'Main performer in the scene'
   },
@@ -152,7 +81,7 @@ const filmFixtures: FilmFixture[] = [
     id: 'extra',
     name: 'Background Actor',
     category: 'People',
-    icon: <ActorIcon />,
+    icon: <IconWrapper src={ActorIcon} alt="Actor" />,
     defaultProps: { width: 45, height: 75, color: '#666666' },
     description: 'Background performer'
   },
@@ -162,7 +91,7 @@ const filmFixtures: FilmFixture[] = [
     id: 'camera',
     name: 'Camera',
     category: 'Equipment',
-    icon: <CameraIcon />,
+    icon: <IconWrapper src={CameraIcon} alt="Camera" />,
     defaultProps: { width: 60, height: 40, color: '#000000' },
     description: 'Primary filming camera'
   },
@@ -170,7 +99,7 @@ const filmFixtures: FilmFixture[] = [
     id: 'camera-b',
     name: 'B-Camera',
     category: 'Equipment',
-    icon: <CameraIcon />,
+    icon: <IconWrapper src={CameraIcon} alt="Camera" />,
     defaultProps: { width: 55, height: 35, color: '#666666' },
     description: 'Secondary camera angle'
   },
@@ -178,7 +107,7 @@ const filmFixtures: FilmFixture[] = [
     id: 'microphone',
     name: 'Microphone',
     category: 'Equipment',
-    icon: <MicIcon />,
+    icon: <IconWrapper src={EquipmentIcon} alt="Microphone" />,
     defaultProps: { width: 25, height: 60, color: '#000000' },
     description: 'Audio recording device'
   },
@@ -188,7 +117,7 @@ const filmFixtures: FilmFixture[] = [
     id: 'key-light',
     name: 'Key Light',
     category: 'Lighting',
-    icon: <LightIcon />,
+    icon: <IconWrapper src={LightIcon} alt="Light" />,
     defaultProps: { width: 30, height: 40, color: '#2196F3' },
     description: 'Primary lighting source'
   },
@@ -196,7 +125,7 @@ const filmFixtures: FilmFixture[] = [
     id: 'fill-light',
     name: 'Fill Light',
     category: 'Lighting',
-    icon: <LightIcon />,
+    icon: <IconWrapper src={LightIcon} alt="Light" />,
     defaultProps: { width: 25, height: 35, color: '#2196F3' },
     description: 'Secondary lighting to reduce shadows'
   },
@@ -204,7 +133,7 @@ const filmFixtures: FilmFixture[] = [
     id: 'fresnel',
     name: 'Fresnel Light',
     category: 'Lighting',
-    icon: <FresnelIcon />,
+    icon: <IconWrapper src={FresnelLightIcon} alt="Fresnel Light" />,
     defaultProps: { width: 40, height: 50, color: '#2196F3' },
     description: 'Focused spotlight with adjustable beam'
   },
@@ -214,7 +143,7 @@ const filmFixtures: FilmFixture[] = [
     id: 'room',
     name: 'Room/Building',
     category: 'Set',
-    icon: <RoomIcon />,
+    icon: <IconWrapper src={RoomIcon} alt="Room" />,
     defaultProps: { width: 100, height: 80, color: '#000000' },
     description: 'Interior or exterior structure'
   },
@@ -222,7 +151,7 @@ const filmFixtures: FilmFixture[] = [
     id: 'chair',
     name: 'Chair',
     category: 'Set',
-    icon: <ChairIcon />,
+    icon: <IconWrapper src={PropIcon} alt="Chair" />,
     defaultProps: { width: 35, height: 40, color: '#8B4513' },
     description: 'Seating furniture'
   },
@@ -230,9 +159,17 @@ const filmFixtures: FilmFixture[] = [
     id: 'table',
     name: 'Table',
     category: 'Set',
-    icon: <TableIcon />,
+    icon: <IconWrapper src={PropIcon} alt="Table" />,
     defaultProps: { width: 60, height: 40, color: '#D2691E' },
     description: 'Table furniture'
+  },
+  {
+    id: 'vehicle',
+    name: 'Vehicle',
+    category: 'Set',
+    icon: <IconWrapper src={VehicleIcon} alt="Vehicle" />,
+    defaultProps: { width: 80, height: 50, color: '#26de81' },
+    description: 'Car, truck, or other vehicle'
   }
 ];
 
